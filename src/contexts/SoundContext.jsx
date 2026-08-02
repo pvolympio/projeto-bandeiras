@@ -1,28 +1,25 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-
-const SoundContext = createContext();
+import { useMemo, useState } from 'react'
+import { SoundSettingsContext } from './soundSettings'
 
 export function SoundProvider({ children }) {
-  const [isMuted, setIsMuted] = useState(() => {
-    const stored = localStorage.getItem('sound_muted');
-    return stored === 'true';
-  });
+  const [isMuted, setIsMuted] = useState(
+    () => localStorage.getItem('sound_muted') === 'true',
+  )
 
-  const toggleSound = () => {
-    setIsMuted(prev => {
-      const newState = !prev;
-      localStorage.setItem('sound_muted', newState);
-      return newState;
-    });
-  };
+  const value = useMemo(() => ({
+    isMuted,
+    toggleSound() {
+      setIsMuted((current) => {
+        const next = !current
+        localStorage.setItem('sound_muted', String(next))
+        return next
+      })
+    },
+  }), [isMuted])
 
   return (
-    <SoundContext.Provider value={{ isMuted, toggleSound }}>
+    <SoundSettingsContext.Provider value={value}>
       {children}
-    </SoundContext.Provider>
-  );
-}
-
-export function useSoundSettings() {
-  return useContext(SoundContext);
+    </SoundSettingsContext.Provider>
+  )
 }

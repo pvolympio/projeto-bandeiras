@@ -1,39 +1,37 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Radio } from 'lucide-react'
+import { Link } from 'wouter'
+
+const footerLinks = [
+  { href: '/sobre', label: 'Sobre o projeto' },
+  { href: '/contato', label: 'Contato' },
+  { href: '/politica-privacidade', label: 'Privacidade' },
+  { href: '/termos-de-uso', label: 'Termos de uso' },
+]
 
 function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-8 mt-auto transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        
-        <div className="text-center md:text-left">
-          <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
-            Bandeiras do Mundo 🌍
-          </span>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Explore, jogue e aprenda geografia.
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 max-w-xs">
-            Este é um projeto educacional independente. Todas as informações são verificadas para garantir precisão.
-          </p>
+    <footer className="site-footer">
+      <div className="site-footer__inner">
+        <div className="site-footer__brand">
+          <Radio aria-hidden="true" />
+          <div>
+            <strong>Bandeiras do Mundo</strong>
+            <p>O planeta fala em cores. Aprenda a ler cada sinal.</p>
+          </div>
         </div>
 
-        <nav className="flex flex-wrap justify-center gap-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-          <Link to="/" className="hover:text-amber-500 transition-colors">Início</Link>
-          <Link to="/sobre" className="hover:text-amber-500 transition-colors">Sobre Nós</Link>
-          <Link to="/contato" className="hover:text-amber-500 transition-colors">Contato</Link>
-          <Link to="/politica-privacidade" className="hover:text-amber-500 transition-colors">Política de Privacidade</Link>
-          <Link to="/termos-de-uso" className="hover:text-amber-500 transition-colors">Termos de Uso</Link>
+        <nav className="site-footer__nav" aria-label="Links institucionais">
+          {footerLinks.map((link) => (
+            <Link key={link.href} href={link.href}>{link.label}</Link>
+          ))}
         </nav>
 
-        <div className="text-xs text-gray-400 dark:text-gray-500">
-          © {currentYear} Todos os direitos reservados.
-        </div>
+        <p className="site-footer__note">
+          © {new Date().getFullYear()} · 193 sinais, um só mundo.
+        </p>
       </div>
     </footer>
-  );
+  )
 }
 
-export default Footer;
+export default Footer

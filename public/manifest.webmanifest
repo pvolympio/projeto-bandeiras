@@ -1,11 +1,13 @@
 {
   "name": "Bandeiras do Mundo",
   "short_name": "Bandeiras",
-  "description": "Teste seus conhecimentos de geografia com nossos quizzes de bandeiras, capitais e países.",
+  "description": "Explore 193 países e teste seus conhecimentos de bandeiras, capitais e continentes.",
+  "lang": "pt-BR",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#f59e0b",
+  "background_color": "#f3f7f4",
+  "theme_color": "#0b3b5b",
   "icons": [
     {
       "src": "/logo.png",

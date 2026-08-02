@@ -3,7 +3,7 @@ export const countryDetails = {
     currency: "Real (BRL)",
     language: "Português",
     neighbors: ["Argentina", "Bolívia", "Colômbia", "Guiana", "Paraguai", "Peru", "Suriname", "Uruguai", "Venezuela", "Guiana Francesa"],
-    funFact: "O Brasil é o único país onde o rio Amazonas flui, e possui a maior biodiversidade do mundo.",
+    funFact: "O Brasil abriga a maior parcela da bacia amazônica, compartilhada com outros países da América do Sul, e concentra uma biodiversidade extraordinária.",
     meaning: "O verde representa as matas, o amarelo as riquezas, o azul o céu e as estrelas, e o branco a paz. A frase 'Ordem e Progresso' vem do positivismo."
   },
   us: {

@@ -67,7 +67,7 @@ function QuizRelampago() {
   // Tela de Menu
   if (gameState === 'menu') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-6 text-center">
+      <div className="quiz-play quiz-play--lightning quiz-play--menu min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-6 text-center">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -95,13 +95,13 @@ function QuizRelampago() {
   // Tela de Fim de Jogo
   if (gameState === 'finished') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-6 text-center">
+      <div className="quiz-play quiz-play--lightning quiz-play--result min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-6 text-center">
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl max-w-md w-full"
         >
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Tempo Esgotado! ⏰</h2>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Tempo Esgotado! ⏰</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">Sua pontuação final:</p>
           <div className="text-6xl font-black text-amber-500 mb-4">{score}</div>
           
@@ -141,7 +141,7 @@ function QuizRelampago() {
 
   // Tela de Jogo
   return (
-    <main className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex flex-col items-center">
+    <main className="quiz-play quiz-play--lightning min-h-screen bg-gray-100 dark:bg-gray-900 p-4 flex flex-col items-center">
       <div className="w-full max-w-2xl">
         {/* Header do Jogo */}
         <div className="flex justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
@@ -159,9 +159,9 @@ function QuizRelampago() {
         {/* Pergunta */}
         {currentCountry && (
           <div className="flex flex-col items-center">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 text-center">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-white mb-6 text-center">
               Qual é a bandeira de <span className="text-amber-500">{currentCountry.name}</span>?
-            </h2>
+            </h1>
 
             <div className="grid grid-cols-2 gap-4 w-full">
               <AnimatePresence mode="popLayout">

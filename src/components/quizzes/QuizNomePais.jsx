@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { allCountries } from '../../data/countryLoader';
 import { normalizeString } from '../../utils/normalizeString';
 import { CheckCircle, SkipForward, Eye, Share2 } from 'lucide-react';
 import { useSound } from '../../hooks/useSound';
@@ -22,18 +21,18 @@ function QuizNomePais() {
   const { highScore, updateHighScore } = useHighScore('nome-pais');
   const { incrementMastery } = useMastery();
   
-  const selectNewCountry = () => {
+  const selectNewCountry = useCallback(() => {
     const newCountry = getNextCountry();
     setCurrentCountry(newCountry);
     setInputValue('');
     setFeedback('');
     setShowAnswer(false);
     setTimeout(() => inputRef.current?.focus(), 100);
-  };
+  }, [getNextCountry]);
 
   useEffect(() => {
     selectNewCountry();
-  }, []);
+  }, [selectNewCountry]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -90,8 +89,11 @@ function QuizNomePais() {
     : 'text-amber-600 dark:text-amber-400';
 
   return (
-    <main className="flex flex-col items-center p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors">
+    <main className="quiz-play quiz-play--country flex flex-col items-center p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors">
       <div className="w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+          Que país tem esta bandeira?
+        </h1>
         {/* Placar e progresso */}
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -133,6 +135,7 @@ function QuizNomePais() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Que país é este?"
+            aria-label="Digite o nome do país"
             disabled={feedback.startsWith('Correto')}
             className="
               w-full p-3 rounded-lg border-2 border-blue-500
@@ -207,6 +210,8 @@ function QuizNomePais() {
           {feedback && (
             <motion.p
               key={feedback}
+              role="status"
+              aria-live="polite"
               className={`mt-4 text-lg font-semibold ${feedbackColor}`}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

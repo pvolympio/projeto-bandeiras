@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { allCountries } from '../../data/countryLoader';
 import { Map, Share2, Globe } from 'lucide-react';
 import { useSound } from '../../hooks/useSound';
 import { useQuestionPool } from '../../hooks/useQuestionPool';
@@ -16,15 +15,15 @@ function QuizContinente() {
   const { getNextCountry } = useQuestionPool();
   const { highScore, updateHighScore } = useHighScore('continente');
 
-  const loadNewQuestion = () => {
+  const loadNewQuestion = useCallback(() => {
     const random = getNextCountry();
     setCurrentCountry(random);
     setFeedback("");
-  };
+  }, [getNextCountry]);
 
   useEffect(() => {
     loadNewQuestion();
-  }, []);
+  }, [loadNewQuestion]);
 
   const handleSelect = (selectedContinent) => {
     if (feedback) return; // Evitar duplo clique
@@ -46,20 +45,20 @@ function QuizContinente() {
   if (!currentCountry) return <div>Carregando...</div>;
 
   return (
-    <main className="min-h-screen flex flex-col items-center p-6 bg-white dark:bg-gray-900 transition-colors">
+    <main className="quiz-play quiz-play--continent min-h-screen flex flex-col items-center p-6 bg-white dark:bg-gray-900 transition-colors">
       <div className="max-w-2xl w-full text-center">
         <div className="flex justify-between items-center mb-6">
           <div className="text-left">
              <p className="text-sm text-gray-500 dark:text-gray-400">Recorde</p>
              <p className="text-xl font-bold text-amber-500">{highScore}</p>
           </div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">Pontuação: {score}</h2>
+          <p className="text-xl font-bold text-gray-800 dark:text-white">Pontuação: {score}</p>
           <Globe className="w-8 h-8 text-amber-500" />
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
           Em qual continente fica <span className="text-amber-500">{currentCountry.name}</span>?
-        </h2>
+        </h1>
 
         <motion.div
           key={currentCountry.code}
@@ -95,6 +94,8 @@ function QuizContinente() {
         <AnimatePresence>
           {feedback && (
             <motion.div
+              role="status"
+              aria-live="polite"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className={`mt-6 text-xl font-bold ${feedback.includes('Correto') ? 'text-green-600' : 'text-red-600'}`}

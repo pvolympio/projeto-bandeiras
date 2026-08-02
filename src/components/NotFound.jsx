@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 import { Map } from 'lucide-react';
 
 function NotFound() {
@@ -12,7 +12,7 @@ function NotFound() {
         Parece que você se perdeu no mapa! A página que você está procurando não existe ou foi movida.
       </p>
       <Link 
-        to="/" 
+        href="/" 
         className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold transition-colors shadow-lg"
       >
         Voltar para o Início

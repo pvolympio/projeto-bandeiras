@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSoundSettings } from '../contexts/SoundContext';
+import { useSoundSettings } from '../contexts/soundSettings';
 
 export function useSound() {
   const { isMuted } = useSoundSettings();

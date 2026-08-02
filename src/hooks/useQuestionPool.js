@@ -1,26 +1,29 @@
-import { useRef } from 'react';
-import { allCountries } from '../data/countryLoader';
+import { useState } from 'react'
+import { allCountries } from '../data/countryLoader'
+
+export function createQuestionPool(countries, random = Math.random) {
+  let remaining = [...countries]
+
+  return {
+    next() {
+      if (remaining.length === 0) remaining = [...countries]
+      const index = Math.floor(random() * remaining.length)
+      return remaining.splice(index, 1)[0]
+    },
+    reset() {
+      remaining = [...countries]
+    },
+    size() {
+      return remaining.length
+    },
+  }
+}
 
 export function useQuestionPool() {
-  const poolRef = useRef([...allCountries]);
+  const [pool] = useState(() => createQuestionPool(allCountries))
 
-  const getNextCountry = () => {
-    if (poolRef.current.length === 0) {
-      poolRef.current = [...allCountries]; // Reseta quando acaba
-    }
-
-    const randomIndex = Math.floor(Math.random() * poolRef.current.length);
-    const selected = poolRef.current[randomIndex];
-
-    // Remove do pool
-    poolRef.current.splice(randomIndex, 1);
-
-    return selected;
-  };
-
-  const resetPool = () => {
-    poolRef.current = [...allCountries];
-  };
-
-  return { getNextCountry, resetPool };
+  return {
+    getNextCountry: pool.next,
+    resetPool: pool.reset,
+  }
 }

@@ -1,23 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState } from 'react'
+import { readNumber } from '../utils/storage'
 
 export function useHighScore(quizId) {
-  const [highScore, setHighScore] = useState(0);
+  const storageKey = `highscore_${quizId}`
+  const [highScore, setHighScore] = useState(() => readNumber(storageKey))
 
-  useEffect(() => {
-    const stored = localStorage.getItem(`highscore_${quizId}`);
-    if (stored) {
-      setHighScore(parseInt(stored, 10));
-    }
-  }, [quizId]);
+  const updateHighScore = useCallback((score) => {
+    let isNewRecord = false
+    setHighScore((current) => {
+      if (score <= current) return current
+      isNewRecord = true
+      localStorage.setItem(storageKey, String(score))
+      return score
+    })
+    return isNewRecord
+  }, [storageKey])
 
-  const updateHighScore = (score) => {
-    if (score > highScore) {
-      setHighScore(score);
-      localStorage.setItem(`highscore_${quizId}`, score.toString());
-      return true; // New high score!
-    }
-    return false;
-  };
-
-  return { highScore, updateHighScore };
+  return { highScore, updateHighScore }
 }

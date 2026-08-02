@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { allCountries } from '../../data/countryLoader';
 import { normalizeString } from '../../utils/normalizeString';
 import { CheckCircle, SkipForward, Eye, Share2 } from 'lucide-react';
 import { useSound } from '../../hooks/useSound';
@@ -23,7 +22,7 @@ function QuizCapital() {
   const { incrementMastery } = useMastery();
 
   // Seleciona um país aleatório que tenha capital válida
-  const selectNewCountry = () => {
+  const selectNewCountry = useCallback(() => {
     let newCountry = getNextCountry();
     // Garante que tenha capital (embora todos no meu data tenham, é bom prevenir)
     while (!newCountry.capital) {
@@ -35,11 +34,11 @@ function QuizCapital() {
     setFeedback('');
     setShowAnswer(false);
     setTimeout(() => inputRef.current?.focus(), 100);
-  };
+  }, [getNextCountry]);
 
   useEffect(() => {
     selectNewCountry();
-  }, []);
+  }, [selectNewCountry]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -96,8 +95,11 @@ function QuizCapital() {
     : 'text-amber-600 dark:text-amber-400';
 
   return (
-    <main className="flex flex-col items-center p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors">
+    <main className="quiz-play quiz-play--capital flex flex-col items-center p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors">
       <div className="w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+          Qual é a capital deste país?
+        </h1>
         {/* Placar e progresso */}
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -139,6 +141,7 @@ function QuizCapital() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Digite o nome da capital..."
+            aria-label="Digite o nome da capital"
             disabled={feedback.startsWith('Correto')}
             className="
               w-full p-3 rounded-lg border-2 border-blue-500
@@ -213,6 +216,8 @@ function QuizCapital() {
           {feedback && (
             <motion.p
               key={feedback}
+              role="status"
+              aria-live="polite"
               className={`mt-4 text-lg font-semibold ${feedbackColor}`}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

@@ -1,16 +1,84 @@
-# React + Vite
+# Bandeiras do Mundo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Atlas interativo em português com 193 países e seis modos de quiz. A aplicação funciona sem cadastro: recordes, domínio de países, tema e som ficam no próprio navegador.
 
-Currently, two official plugins are available:
+## Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18 e Vite 8
+- TypeScript incremental
+- Wouter para rotas leves
+- Tailwind CSS e CSS autoral
+- Vitest e Testing Library
+- PWA com service worker próprio
 
-## React Compiler
+## Executar localmente
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Requisitos: Node.js 24 ou superior e npm.
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+O endereço local será exibido pelo Vite.
+
+## Verificações
+
+```bash
+npm run lint          # qualidade e regras de hooks
+npm run typecheck     # configuração TypeScript
+npm test              # testes automatizados
+npm run validate:data # códigos, bandeiras e áudios
+npm run build         # bundle de produção
+npm run check         # executa toda a sequência acima
+```
+
+## Dados e arquivos
+
+- `src/data/countries.js`: catálogo editorial em português.
+- `src/data/countryMetadata.js`: área, sub-região e nome oficial em um formato compacto.
+- `public/flags`: bandeiras em SVG.
+- `public/audio/countries`: pronúncias em MP3.
+- `src/data/countryDetails.js`: textos editoriais específicos.
+
+Ao atualizar a dependência de referência `world-countries`, regenere o arquivo compacto:
+
+```bash
+npm run generate:metadata
+npm run validate:data
+```
+
+O sitemap é atualizado com:
+
+```bash
+npm run generate:sitemap
+```
+
+## Privacidade
+
+O script de anúncios não é incluído no HTML inicial. Ele é carregado somente depois da escolha explícita “Permitir anúncios”. A opção “Só o necessário” mantém todos os quizzes disponíveis.
+
+## PWA
+
+O manifesto fica em `public/manifest.webmanifest`. O service worker:
+
+- mantém um shell mínimo para abertura offline;
+- guarda bandeiras e áudios apenas quando são solicitados;
+- remove caches antigos ao receber uma nova versão.
+
+Ao alterar a estratégia de cache, incremente `VERSION` em `public/sw.js`.
+
+## Deploy
+
+O arquivo `vercel.json` direciona as rotas da SPA para `index.html`. Antes de publicar:
+
+```bash
+npm run check
+```
+
+Depois confirme no ambiente final:
+
+- navegação direta para uma página de país;
+- instalação como aplicativo;
+- escolha de privacidade;
+- compartilhamento e áudio em dispositivo real.

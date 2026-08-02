@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { allCountries } from '../../data/countryLoader';
 import { ArrowUp, ArrowDown, Users, Share2 } from 'lucide-react';
 import { useSound } from '../../hooks/useSound';
 import { useQuestionPool } from '../../hooks/useQuestionPool';
@@ -20,7 +19,7 @@ function QuizPopulacao() {
   const formatPop = (num) => new Intl.NumberFormat('pt-BR').format(num);
 
   // Iniciar jogo
-  const startGame = () => {
+  const startGame = useCallback(() => {
     const randomA = getNextCountry();
     let randomB = getNextCountry();
     
@@ -34,11 +33,11 @@ function QuizPopulacao() {
     setScore(0);
     setGameOver(false);
     setReveal(false);
-  };
+  }, [getNextCountry]);
 
   useEffect(() => {
     startGame();
-  }, []);
+  }, [startGame]);
 
   // Próxima rodada
   const nextRound = () => {
@@ -74,7 +73,7 @@ function QuizPopulacao() {
 
   if (gameOver) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6 text-center">
+      <main className="quiz-play quiz-play--population quiz-play--result min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6 text-center">
         <h1 className="text-4xl font-bold mb-4 text-red-500">Fim de Jogo!</h1>
         <p className="text-xl mb-2">Você acertou {score} seguidas.</p>
         <p className="text-amber-500 font-bold mb-6 text-lg">
@@ -100,12 +99,13 @@ function QuizPopulacao() {
             <Share2 className="w-5 h-5" /> Desafiar Amigos
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col md:flex-row bg-gray-900 text-white overflow-hidden">
+    <main className="quiz-play quiz-play--population min-h-screen flex flex-col md:flex-row bg-gray-900 text-white overflow-hidden">
+      <h1 className="sr-only">Qual país tem a maior população?</h1>
       {/* País A */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-800 relative border-b-4 md:border-b-0 md:border-r-4 border-gray-900">
         <img src={`/flags/${countryA.code}.svg`} alt={countryA.name} className="w-48 mb-4 rounded shadow-lg" />

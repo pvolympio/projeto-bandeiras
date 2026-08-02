@@ -1,234 +1,273 @@
-import { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { allCountries } from '../data/countryLoader';
-import { Star } from 'lucide-react';
-import { useMastery } from '../hooks/useMastery';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight, Compass, Radio, Search, Sparkles, Star, X, Zap } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
+import { Link } from 'wouter'
+import { allCountries } from '../data/countryLoader'
+import { useMastery } from '../hooks/useMastery'
+import InteractiveWorldMap from './InteractiveWorldMap'
+import { FlagGridSkeleton } from './FlagSkeletonLoader'
 
-// Função auxiliar para normalizar texto na busca
-function normalizeForSearch(s = '') {
-  return String(s)
+const FEATURED_CODES = ['br', 'jp', 'za', 'ca', 'in', 'fr', 'mx', 'nz', 'kr', 'eg', 'ar', 'no']
+const ORBIT_CODES = ['br', 'jp', 'za', 'ca', 'in', 'mx', 'nz', 'eg']
+const PAGE_SIZE = 48
+
+function normalizeForSearch(value = '') {
+  return String(value)
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .trim();
+    .trim()
 }
 
 function FuncaoBandeiras() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [continentFilter, setContinentFilter] = useState('todos');
-  const { isMastered } = useMastery();
+  const [searchTerm, setSearchTerm] = useState('')
+  const [continentFilter, setContinentFilter] = useState('todos')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const { isMastered } = useMastery()
 
-  // Lista base de países, ordenada em português
-  const baseCountries = useMemo(() => {
-    if (!Array.isArray(allCountries)) return [];
-    return [...allCountries].sort((a, b) =>
-      a.name.localeCompare(b.name, 'pt-BR')
-    );
-  }, []);
+  const countries = useMemo(
+    () => [...allCountries].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+    [],
+  )
 
-  // Lista de continentes únicos
-  const continents = useMemo(() => {
-    const setCont = new Set();
-    for (const c of baseCountries) {
-      if (c.continent) setCont.add(c.continent);
-    }
-    return ['todos', ...Array.from(setCont).sort((a, b) => a.localeCompare(b, 'pt-BR'))];
-  }, [baseCountries]);
+  const masteredCount = useMemo(
+    () => countries.filter((c) => isMastered(c.code)).length,
+    [countries, isMastered],
+  )
 
-  // Filtro combinado (busca + continente)
-  const filteredAndUnique = useMemo(() => {
-    const termNorm = normalizeForSearch(searchTerm);
+  const continents = useMemo(
+    () => ['todos', ...new Set(countries.map((country) => country.continent).filter(Boolean))],
+    [countries],
+  )
 
-    const filtered = baseCountries.filter((country) => {
-      if (continentFilter !== 'todos' && country.continent !== continentFilter)
-        return false;
+  const featuredCountries = useMemo(
+    () => FEATURED_CODES.map((code) => countries.find((country) => country.code === code)).filter(Boolean),
+    [countries],
+  )
 
-      if (!termNorm) return true;
+  const orbitCountries = useMemo(
+    () => ORBIT_CODES.map((code) => countries.find((country) => country.code === code)).filter(Boolean),
+    [countries],
+  )
 
-      const nameNorm = normalizeForSearch(country.name || '');
-      const codeNorm = normalizeForSearch(country.code || '');
-      const capitalNorm = normalizeForSearch(country.capital || '');
+  const filteredCountries = useMemo(() => {
+    const term = normalizeForSearch(searchTerm)
 
-      return (
-        nameNorm.includes(termNorm) ||
-        codeNorm.includes(termNorm) ||
-        capitalNorm.includes(termNorm)
-      );
-    });
+    return countries.filter((country) => {
+      if (continentFilter !== 'todos' && country.continent !== continentFilter) return false
+      if (!term) return true
 
-    const unique = [];
-    const seen = new Set();
-    for (const c of filtered) {
-      const key = String(c.code || '').toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        unique.push(c);
-      }
-    }
+      return [country.name, country.code, country.capital]
+        .some((value) => normalizeForSearch(value).includes(term))
+    })
+  }, [continentFilter, countries, searchTerm])
 
-    return unique;
-  }, [searchTerm, continentFilter, baseCountries]);
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [continentFilter, searchTerm])
 
-  // Variantes de animação
-  const gridVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.03 } },
-  };
-  const flagVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
-
-  // Função para limpar filtros
-  const handleClearFilters = () => {
-    setSearchTerm('');
-    setContinentFilter('todos');
-  };
+  const hasFilters = Boolean(searchTerm) || continentFilter !== 'todos'
+  const clearFilters = () => {
+    setSearchTerm('')
+    setContinentFilter('todos')
+  }
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 min-h-screen transition-colors duration-300">
-      {/* Introdução e SEO Content */}
-      <div className="max-w-4xl mx-auto text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-amber-600 dark:text-amber-500 mb-4">
-          Explore as Bandeiras de Todos os Países
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-          Bem-vindo ao <strong>Bandeiras do Mundo</strong>, sua enciclopédia interativa definitiva sobre vexilologia e geografia. 
-          Navegue por nossa coleção completa de bandeiras, aprenda sobre capitais, populações e continentes. 
-          Prepare-se para nossos quizzes desafiadores e torne-se um mestre da geografia global!
-        </p>
-      </div>
-
-      {/* Header com busca + dropdown + botão limpar */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6">
-        <input
-          type="text"
-          placeholder="Pesquisar por nome, código ou capital (ex: br, brasil, paris)..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          autoFocus
-          className="
-            w-full max-w-md p-3 rounded-lg border-2 border-amber-500
-            text-gray-800 dark:text-gray-100
-            bg-gray-50 dark:bg-gray-800
-            focus:outline-none focus:ring-2 focus:ring-amber-400
-            placeholder-gray-500 dark:placeholder-gray-400
-            shadow-sm
-          "
+    <main className="home-page">
+      <Helmet>
+        <title>Bandeiras do Mundo — Aprenda geografia jogando</title>
+        <meta
+          name="description"
+          content="Explore as bandeiras de 193 países e teste seus conhecimentos em quizzes de capitais, continentes e geografia."
         />
+        <link rel="canonical" href="https://bandeirasdomundo.com/" />
+        <meta property="og:title" content="Bandeiras do Mundo — Aprenda geografia jogando" />
+        <meta property="og:description" content="Um atlas interativo com 193 países e seis modos de jogo." />
+        <meta property="og:url" content="https://bandeirasdomundo.com/" />
+      </Helmet>
 
-        <select
-          value={continentFilter}
-          onChange={(e) => setContinentFilter(e.target.value)}
-          className="
-            p-3 rounded-lg border-2 border-amber-500
-            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200
-            focus:outline-none focus:ring-2 focus:ring-amber-400
-          "
-        >
-          {continents.map((cont) => (
-            <option key={cont} value={cont}>
-              {cont === 'todos' ? 'Todos os continentes' : cont}
-            </option>
-          ))}
-        </select>
-
-        <button
-          onClick={handleClearFilters}
-          className="
-            px-4 py-3 rounded-lg bg-amber-500 text-white font-medium
-            hover:bg-amber-600 transition-colors shadow-sm
-          "
-        >
-          Limpar filtros
-        </button>
-      </div>
-
-      {/* Grid de bandeiras */}
-      <motion.div
-        key={`${searchTerm}-${continentFilter}`} // 👈 força reanimação
-        className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-5 p-5"
-        variants={gridVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {filteredAndUnique.length > 0 ? (
-          filteredAndUnique.map((country) => {
-            const src = `/flags/${(country.code || '').toLowerCase()}.svg`;
-            return (
-              <Link
-                to={`/pais/${country.code}`}
-                key={country.code}
-              >
-                <motion.div
-                  variants={flagVariants}
-                  whileHover={{ scale: 1.07 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="
-                    cursor-pointer border-2 border-amber-500 rounded-lg p-4 text-center
-                    transition-all duration-200 ease-in-out dark:hover:bg-gray-800 relative
-                  "
-                >
-                  {isMastered(country.code) && (
-                    <div className="absolute top-2 right-2 bg-amber-500 text-white rounded-full p-1 shadow-md" title="Dominado!">
-                      <Star className="w-3 h-3 fill-current" />
-                    </div>
-                  )}
-                  <img
-                    src={src}
-                    alt={country.name}
-                    width="80"
-                    height="80"
-                    loading="lazy"
-                    className="w-20 h-auto rounded-lg inline-block shadow-sm"
-                    onError={(e) => {
-                      e.currentTarget.src = '/flags/placeholder.svg';
-                    }}
-                  />
-                  <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {country.name}
-                  </p>
-                  {country.continent && (
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {country.continent}
-                    </p>
-                  )}
-                </motion.div>
-              </Link>
-            );
-          })
-        ) : (
-          <p className="col-span-full text-center text-gray-600 dark:text-gray-300">
-            Nenhum país encontrado 😕
-          </p>
-        )}
-      </motion.div>
-
-      {/* Seção de Destaque / Curiosidade Aleatória para SEO */}
-      <div className="max-w-4xl mx-auto mt-12 mb-8 p-6 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800/50">
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          <div className="p-4 bg-white dark:bg-gray-800 rounded-full shadow-sm">
-            <Star className="w-8 h-8 text-amber-500" />
-          </div>
-          <div className="text-center md:text-left">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
-              Você sabia?
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Existem 193 países membros das Nações Unidas, mas se contarmos territórios dependentes e estados com reconhecimento limitado, o número de bandeiras para aprender passa de 250! 
-              Cada bandeira conta uma história única sobre a geografia, política e cultura de seu povo.
+      <section className="atlas-hero" aria-labelledby="hero-title">
+        <div className="hero-signal-lines" aria-hidden="true"><i /><i /><i /></div>
+        <div className="atlas-hero__grid">
+          <div className="atlas-hero__copy">
+            <p className="atlas-kicker">
+              <Radio aria-hidden="true" />
+              Frequência global · 193 países
             </p>
-            <Link 
-              to="/curiosidades" 
-              className="inline-block mt-4 text-amber-600 dark:text-amber-400 font-medium hover:underline"
-            >
-              Ler mais curiosidades →
+            <h1 id="hero-title">
+              Leia o mundo.
+              <span>Pelas cores.</span>
+            </h1>
+            <p className="atlas-hero__lead">
+              Bandeiras são sinais. Treine o olhar, conecte países e descubra uma nova forma de enxergar o planeta.
+            </p>
+            <div className="atlas-hero__actions">
+              <Link href="/quiz/bandeira" className="button button--primary">
+                Captar primeiro sinal <Zap aria-hidden="true" />
+              </Link>
+              <a href="#atlas" className="button button--quiet">Ver todos os países</a>
+            </div>
+            <div className="hero-proof" aria-label="Resumo da plataforma">
+              <span><strong>06</strong> modos de jogo</span>
+              <span><strong>193</strong> países</span>
+              <span><strong>∞</strong> novas rodadas</span>
+            </div>
+          </div>
+
+          <div className="signal-orbit" aria-label="Constelação de bandeiras do mundo">
+            <div className="signal-orbit__rings" aria-hidden="true"><i /><i /><i /></div>
+            <div className="signal-orbit__core">
+              <span>Sinais ativos</span>
+              <strong>193</strong>
+              <small>AO VIVO</small>
+            </div>
+            {orbitCountries.map((country, index) => (
+              <Link
+                key={country.code}
+                href={`/pais/${country.code}`}
+                className="signal-orbit__flag"
+                style={{ '--orbit-angle': `${index * 45}deg` }}
+                title={country.name}
+              >
+                <img src={`/flags/${country.code}.svg`} alt={`Bandeira de ${country.name}`} />
+              </Link>
+            ))}
+            <Link href="/perfil" className="signal-orbit__progress">
+              Meu sinal <ArrowRight aria-hidden="true" />
             </Link>
           </div>
         </div>
-      </div>
 
+        <div className="flag-ribbon" aria-label="Bandeiras em destaque">
+          <div className="flag-ribbon__track">
+            {[...featuredCountries, ...featuredCountries].map((country, index) => (
+              <Link
+                key={`${country.code}-${index}`}
+                href={`/pais/${country.code}`}
+                className="flag-ribbon__item"
+                aria-hidden={index >= featuredCountries.length}
+                tabIndex={index >= featuredCountries.length ? -1 : undefined}
+              >
+                <img src={`/flags/${country.code}.svg`} alt="" />
+                <span>{country.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    </div>
-  );
+      <section id="atlas" className="country-explorer" aria-labelledby="explorer-title">
+        {/* MAPA GLOBAL INTERATIVO */}
+        <InteractiveWorldMap
+          selectedContinent={continentFilter}
+          onSelectContinent={setContinentFilter}
+          masteredCount={masteredCount}
+          totalCount={countries.length}
+        />
+
+        <div className="section-heading">
+          <div>
+            <p className="section-heading__eyebrow">Diretório de sinais</p>
+            <h2 id="explorer-title">Sintonize um país.</h2>
+          </div>
+          <p>{filteredCountries.length} {filteredCountries.length === 1 ? 'destino encontrado' : 'destinos encontrados'}</p>
+        </div>
+
+        <div className="atlas-filters" role="search">
+          <label className="search-field">
+            <span className="sr-only">Pesquisar país, código ou capital</span>
+            <Search aria-hidden="true" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="País, código ou capital…"
+            />
+          </label>
+
+          <label className="continent-field">
+            <span className="sr-only">Filtrar por continente</span>
+            <select value={continentFilter} onChange={(event) => setContinentFilter(event.target.value)}>
+              {continents.map((continent) => (
+                <option key={continent} value={continent}>
+                  {continent === 'todos' ? 'Todos os continentes' : continent}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {hasFilters && (
+            <button className="clear-filter" type="button" onClick={clearFilters}>
+              <X aria-hidden="true" /> Limpar
+            </button>
+          )}
+        </div>
+
+        {filteredCountries.length > 0 ? (
+          <>
+            <div className="country-grid">
+              {filteredCountries.slice(0, visibleCount).map((country) => {
+                const mastered = isMastered(country.code)
+                return (
+                  <Link
+                    key={country.code}
+                    href={`/pais/${country.code}`}
+                    className={`country-card country-card-3d ${mastered ? 'is-mastered' : ''} country-card--${normalizeForSearch(country.continent).replaceAll(' ', '-')}`}
+                  >
+                    <span className="country-card__code">{country.code.toUpperCase()}</span>
+                    {mastered && (
+                      <span className="country-card__mastery" title="País dominado">
+                        <Star aria-hidden="true" />
+                        <span className="sr-only">País dominado</span>
+                      </span>
+                    )}
+                    <span className="country-card__flag">
+                      <img
+                        src={`/flags/${country.code}.svg`}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </span>
+                    <strong>{country.name}</strong>
+                    <span>{country.continent}</span>
+                  </Link>
+                )
+              })}
+            </div>
+
+            {visibleCount < filteredCountries.length && (
+              <button
+                className="button button--load"
+                type="button"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              >
+                Mostrar mais países
+              </button>
+            )}
+          </>
+        ) : (
+          <div className="empty-atlas">
+            <Compass aria-hidden="true" />
+            <h3>Nenhuma rota encontrada</h3>
+            <p>Tente outro nome, uma capital ou remova o filtro de continente.</p>
+            <button type="button" onClick={clearFilters}>Ver todos os países</button>
+          </div>
+        )}
+      </section>
+
+      <section className="discovery-callout" aria-labelledby="discovery-title">
+        <div>
+          <p className="section-heading__eyebrow"><Sparkles aria-hidden="true" /> Além da superfície</p>
+          <h2 id="discovery-title">Toda cor guarda uma história.</h2>
+        </div>
+        <p>
+          Descubra símbolos, semelhanças inesperadas e fatos verificados sobre a geografia de cada país.
+        </p>
+        <Link href="/curiosidades">Decodificar histórias <ArrowRight aria-hidden="true" /></Link>
+      </section>
+    </main>
+  )
 }
 
-export default FuncaoBandeiras;
+export default FuncaoBandeiras

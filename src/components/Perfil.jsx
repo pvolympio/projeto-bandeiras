@@ -1,13 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useMastery } from '../hooks/useMastery';
-import { useHighScore } from '../hooks/useHighScore';
-import { Trophy, Star, Medal, Crown, Map, Flag, Zap, Users, Type, MapPin, Share2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Trophy, Star, Medal, Crown, Map, Flag, Zap, Users, Type, MapPin, Share2, Sparkles } from 'lucide-react';
+import { Link } from 'wouter';
+import BioluminescentDonutChart from './BioluminescentDonutChart';
 
 function Perfil() {
   const { getTotalMastered } = useMastery();
   const totalStars = getTotalMastered();
+  const totalCountries = 193;
+  const masteryPercentage = Math.min(100, (totalStars / totalCountries) * 100);
 
   // Níveis baseados em estrelas
   const getLevel = (stars) => {
@@ -20,7 +22,6 @@ function Perfil() {
 
   const level = getLevel(totalStars);
 
-  // Helper para pegar high scores (já que o hook é por id)
   const getScore = (id) => localStorage.getItem(`highscore_${id}`) || 0;
 
   const stats = [
@@ -55,69 +56,82 @@ function Perfil() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 transition-colors">
       <div className="max-w-4xl mx-auto">
         
-        {/* Cabeçalho do Perfil */}
+        {/* Cabeçalho do Perfil com Gráfico Bioluminescente */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8 text-center"
+          className="holographic-card p-8 mb-8 text-center"
         >
-          <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">
-            👤
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Seu Perfil</h1>
-          
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <span className={`${level.color} flex items-center gap-2 font-bold text-xl`}>
-              {level.icon} {level.title}
-            </span>
+          <div className="flex flex-col md:flex-row items-center justify-around gap-6">
+            <div className="flex flex-col items-center">
+              <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700/80 rounded-full mb-4 flex items-center justify-center text-4xl shadow-inner border border-white/20">
+                🌐
+              </div>
+              <h1 className="text-3xl font-black text-gray-800 dark:text-white mb-1">Seu Perfil</h1>
+              <div className="flex items-center gap-2 mb-4">
+                <span className={`${level.color} flex items-center gap-2 font-bold text-lg`}>
+                  {level.icon} {level.title}
+                </span>
+              </div>
+            </div>
+
+            {/* GRÁFICO DONUT BIOLUMINESCENTE */}
+            <BioluminescentDonutChart
+              percentage={masteryPercentage}
+              size={150}
+              label="Progresso de Atlas"
+              subLabel={`${totalStars}/${totalCountries}`}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-6">
-            <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800">
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Países Dominados</p>
-              <p className="text-3xl font-black text-amber-500 flex items-center justify-center gap-2">
-                {totalStars} <Star className="w-6 h-6 fill-current" />
+          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto my-6">
+            <div className="bg-amber-50/80 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800">
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">Países Dominados</p>
+              <p className="text-3xl font-black text-amber-500 flex items-center justify-center gap-2 mt-1">
+                {totalStars} <Star className="w-6 h-6 fill-current animate-pulse" />
               </p>
             </div>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Próximo Nível</p>
-              <p className="text-xl font-bold text-blue-500 mt-1">
+            <div className="bg-cyan-50/80 dark:bg-cyan-900/20 p-4 rounded-xl border border-cyan-200 dark:border-cyan-800">
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">Próximo Nível</p>
+              <p className="text-xl font-bold text-cyan-600 dark:text-cyan-400 mt-2">
                 {totalStars < 10 ? 10 - totalStars : 
                  totalStars < 50 ? 50 - totalStars : 
                  totalStars < 100 ? 100 - totalStars : 
                  totalStars < 150 ? 150 - totalStars : 'Máximo!'} 
-                 <span className="text-sm font-normal text-gray-400 ml-1">estrelas</span>
+                 <span className="text-xs font-normal text-gray-400 ml-1">países</span>
               </p>
             </div>
           </div>
 
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition font-bold shadow-lg transform hover:scale-105"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 rounded-full hover:scale-105 transition font-black shadow-lg"
           >
             <Share2 className="w-5 h-5" />
             Compartilhar Progresso
           </button>
         </motion.div>
 
-        {/* Recordes */}
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Seus Recordes</h2>
+        {/* Recordes com Holographic Cards */}
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+          <Sparkles className="w-6 h-6 text-amber-500" /> Seus Recordes por Categoria
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex items-center justify-between"
+              transition={{ delay: index * 0.08 }}
+              className="holographic-card p-6 flex items-center justify-between"
             >
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-lg ${stat.color}`}>
+                <div className={`p-3 rounded-xl ${stat.color} shadow-sm`}>
                   {stat.icon}
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-800 dark:text-white">{getScore(stat.id)}</p>
+                  <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-2xl font-black text-gray-800 dark:text-white">{getScore(stat.id)}</p>
                 </div>
               </div>
             </motion.div>
@@ -125,7 +139,7 @@ function Perfil() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link to="/quiz" className="px-8 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition shadow-lg">
+          <Link href="/quiz" className="px-8 py-3.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl transition shadow-xl inline-block hover:scale-105">
             Continuar Jogando
           </Link>
         </div>

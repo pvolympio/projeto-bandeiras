@@ -1,4 +1,3 @@
-import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { allCountries } from '../data/countryLoader';
 import { 
@@ -13,9 +12,8 @@ import {
   Sun
 } from 'lucide-react';
 
-function Curiosidades() {
+const stats = (() => {
   // --- CÁLCULO DE ESTATÍSTICAS (Robustecido) ---
-  const stats = useMemo(() => {
     // 1. Se a lista estiver vazia, não há nada a fazer
     if (!allCountries || allCountries.length === 0) return null;
 
@@ -40,7 +38,9 @@ function Curiosidades() {
     const smallestArea = [...withArea].sort((a, b) => a.area - b.area)[0];
 
     return { mostPopulous, leastPopulous, largestArea, smallestArea };
-  }, []);
+})();
+
+function Curiosidades() {
 
   // --- CURIOSIDADES ESTÁTICAS ---
   const triviaFacts = [

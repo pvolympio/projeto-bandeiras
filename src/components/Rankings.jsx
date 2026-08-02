@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { allCountries } from '../data/countryLoader';
 import { Trophy, Users, Map as MapIcon, ArrowUp, ArrowDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 
 function Rankings() {
   const rankings = useMemo(() => {
@@ -102,7 +102,7 @@ function RankingList({ title, icon, data, valueKey, formatter, suffix, color }) 
         {data.map((country, index) => (
           <li key={country.code} className="flex items-center gap-3">
             <span className="font-bold text-gray-400 w-6 text-right">#{index + 1}</span>
-            <Link to={`/pais/${country.code}`} className="flex items-center gap-3 flex-1 hover:bg-white/50 dark:hover:bg-black/20 p-2 rounded-lg transition">
+            <Link href={`/pais/${country.code}`} className="flex items-center gap-3 flex-1 hover:bg-white/50 dark:hover:bg-black/20 p-2 rounded-lg transition">
               <img 
                 src={`/flags/${country.code}.svg`} 
                 alt={country.name} 

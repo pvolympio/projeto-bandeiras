@@ -1,46 +1,41 @@
-import React from 'react';
-
 function TermosDeUso() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-6 sm:p-12 transition-colors">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <h1 className="text-3xl font-bold mb-6 text-amber-600 dark:text-amber-500">Termos de Uso</h1>
-        
-        <p className="mb-4">Ao acessar o site <strong>Bandeiras do Mundo</strong>, você concorda em cumprir estes termos de serviço, todas as leis e regulamentos aplicáveis ​​e concorda que é responsável pelo cumprimento de todas as leis locais aplicáveis.</p>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-6 sm:p-12 transition-colors">
+      <article className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <h1 className="text-3xl font-bold mb-6 text-amber-600 dark:text-amber-500">Termos de uso</h1>
 
-        <h2 className="text-xl font-bold mt-6 mb-3">1. Licença de Uso</h2>
-        <p className="mb-4 text-sm">
-          É concedida permissão para baixar temporariamente uma cópia dos materiais (informações ou software) no site Bandeiras do Mundo, apenas para visualização transitória pessoal e não comercial. Esta é a concessão de uma licença, não uma transferência de título e, sob esta licença, você não pode:
+        <p className="mb-4">
+          Ao acessar o <strong>Bandeiras do Mundo</strong>, você concorda em usar o projeto de forma lícita e responsável.
         </p>
+
+        <h2 className="text-xl font-bold mt-6 mb-3">1. Finalidade educacional</h2>
+        <p className="mb-4 text-sm">
+          O conteúdo e os jogos são oferecidos para estudo, consulta e entretenimento. Você pode acessar e compartilhar links para as páginas, respeitando os direitos associados às fontes e aos recursos utilizados.
+        </p>
+
+        <h2 className="text-xl font-bold mt-6 mb-3">2. Uso permitido</h2>
         <ul className="list-disc pl-6 mb-4 text-sm space-y-2">
-          <li>Modificar ou copiar os materiais;</li>
-          <li>Usar os materiais para qualquer finalidade comercial ou para exibição pública (comercial ou não comercial);</li>
-          <li>Tentar descompilar ou fazer engenharia reversa de qualquer software contido no site Bandeiras do Mundo;</li>
-          <li>Remover quaisquer direitos autorais ou outras notações de propriedade dos materiais; ou</li>
-          <li>Transferir os materiais para outra pessoa ou 'espelhe' os materiais em qualquer outro servidor.</li>
+          <li>Não tente interromper, sobrecarregar ou explorar indevidamente o serviço.</li>
+          <li>Não use o projeto para distribuir conteúdo ilegal ou prejudicial.</li>
+          <li>Não apresente o conteúdo do projeto como se fosse uma publicação oficial de governos ou organizações internacionais.</li>
         </ul>
 
-        <h2 className="text-xl font-bold mt-6 mb-3">2. Isenção de responsabilidade</h2>
+        <h2 className="text-xl font-bold mt-6 mb-3">3. Precisão e atualizações</h2>
         <p className="mb-4 text-sm">
-          Os materiais no site da Bandeiras do Mundo são fornecidos 'como estão'. Bandeiras do Mundo não oferece garantias, expressas ou implícitas, e, por este meio, isenta e nega todas as outras garantias, incluindo, sem limitação, garantias implícitas ou condições de comercialização, adequação a um fim específico ou não violação de propriedade intelectual ou outra violação de direitos.
+          Os dados são revisados para uso educacional, mas países, populações e informações institucionais podem mudar. Correções podem ser enviadas pela página de contato.
         </p>
 
-        <h2 className="text-xl font-bold mt-6 mb-3">3. Limitações</h2>
+        <h2 className="text-xl font-bold mt-6 mb-3">4. Disponibilidade</h2>
         <p className="mb-4 text-sm">
-          Em nenhum caso o Bandeiras do Mundo ou seus fornecedores serão responsáveis ​​por quaisquer danos (incluindo, sem limitação, danos por perda de dados ou lucro ou devido a interrupção dos negócios) decorrentes do uso ou da incapacidade de usar os materiais em Bandeiras do Mundo.
-        </p>
-
-        <h2 className="text-xl font-bold mt-6 mb-3">4. Precisão dos materiais</h2>
-        <p className="mb-4 text-sm">
-          Os materiais exibidos no site da Bandeiras do Mundo podem incluir erros técnicos, tipográficos ou fotográficos. Bandeiras do Mundo não garante que qualquer material em seu site seja preciso, completo ou atual. Bandeiras do Mundo pode fazer alterações nos materiais contidos em seu site a qualquer momento, sem aviso prévio.
+          O projeto pode receber atualizações, ficar temporariamente indisponível ou ter funcionalidades alteradas para melhorar segurança, desempenho e conteúdo.
         </p>
 
         <p className="mt-8 text-xs text-gray-500 border-t pt-4 dark:border-gray-600">
-          Estes termos são efetivos a partir de <strong>{new Date().getFullYear()}</strong>.
+          Versão vigente em <strong>{new Date().getFullYear()}</strong>.
         </p>
-      </div>
-    </div>
-  );
+      </article>
+    </main>
+  )
 }
 
-export default TermosDeUso;
+export default TermosDeUso
